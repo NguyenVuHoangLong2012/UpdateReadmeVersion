@@ -7,15 +7,20 @@ tag = os.environ.get("GITHUB_REF_NAME", "").strip()
 if not tag:
 	raise SystemExit("Missing GITHUB_REF_NAME")
 
-version = tag.lstrip("v")
+match = re.fullmatch(r"^(?![-_])(?=.{3,}$)(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)*)?[vV]?(\d+(?:\.\d+)*)$", tag)
+
+if not match:
+	raise SystemExit("Invalid tag format")
+
+version = match.group(1)
 
 readme = Path("README.md")
 
 text = readme.read_text(encoding="utf-8")
 
 new_text, count = re.subn(
-	r"(?im)^Version:\s*.+$",
-	f"Version: {version}",
+	r"(?<!\d)[vV]?\d+(?:\.\d+)+(?!\d)",
+	version,
 	text,
 	count=1
 )
