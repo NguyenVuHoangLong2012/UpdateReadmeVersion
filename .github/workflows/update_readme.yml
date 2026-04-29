@@ -3,7 +3,7 @@ name: Update README Version
 on:
   push:
     tags:
-      - "v*"
+      - "*"
 
 jobs:
   update:
@@ -15,7 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          fetch-depth: 0
+
+      - name: Check tag is on main
+        run: |
+          git fetch origin main
+          git branch -r --contains $GITHUB_SHA | grep origin/main
+
+      - name: Switch to main
+        run: |
+          git checkout main
+          git pull origin main
 
       - uses: actions/setup-python@v5
         with:
@@ -29,8 +39,7 @@ jobs:
           git config user.email "actions@github.com"
 
           git add README.md
-
           git diff --cached --quiet && exit 0
 
           git commit -m "Update README version to $GITHUB_REF_NAME"
-          git push
+          git push origin main
