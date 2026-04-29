@@ -27,6 +27,10 @@ jobs:
           git checkout main
           git pull origin main
 
+      - name: Validate tag
+        run: |
+          echo "$GITHUB_REF_NAME" | grep -Ei "[0-9]"
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
